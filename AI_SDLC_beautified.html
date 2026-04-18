@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>AI-Driven SDLC</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  }
+
+  .slide {
+    width: 960px;
+    height: 540px;
+    background: linear-gradient(135deg, #0d1b3e 0%, #0f2251 100%);
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+
+  /* Grid overlay */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(46,109,204,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(46,109,204,0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* ── Header ── */
+  .header {
+    position: absolute;
+    top: 18px;
+    left: 32px;
+    right: 160px;
+  }
+  .title-en {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+  .title-zh {
+    font-size: 14px;
+    color: #5DADE2;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Company badge */
+  .company {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    border: 1.5px solid #5DADE2;
+    border-radius: 4px;
+    padding: 4px 12px;
+    color: #5DADE2;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: rgba(26,47,107,0.8);
+  }
+
+  /* ── Gatekeeper Banner ── */
+  .gk-banner {
+    position: absolute;
+    top: 102px;
+    left: 24px;
+    right: 24px;
+    height: 28px;
+    background: #2E6DCC;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .gk-banner span { color: #FFD966; margin: 0 4px; }
+
+  /* ── Stage Cards ── */
+  .stages {
+    position: absolute;
+    top: 140px;
+    left: 24px;
+    right: 24px;
+    display: flex;
+    gap: 10px;
+    height: 268px;
+  }
+
+  .card {
+    flex: 1;
+    background: #1a2f6b;
+    border: 1.5px solid #2E6DCC;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px 12px;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(46,109,204,0.4);
+    border-color: #5DADE2;
+  }
+
+  .card-num {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #2E6DCC;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 30px;
+    letter-spacing: 2px;
+  }
+
+  .card-icon {
+    font-size: 42px;
+    margin: 10px 0 8px;
+    line-height: 1;
+  }
+
+  .card-divider {
+    width: 70%;
+    height: 1.5px;
+    background: #2E6DCC;
+    margin: 6px 0;
+  }
+
+  .card-ai {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #C0392B;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .card-human {
+    font-size: 12px;
+    color: #CCD6F1;
+    text-align: center;
+    margin-top: 3px;
+  }
+
+  /* Arrow between cards */
+  .arrow {
+    display: flex;
+    align-items: center;
+    color: #5DADE2;
+    font-size: 16px;
+    align-self: center;
+    flex: 0 0 auto;
+    width: 14px;
+    justify-content: center;
+  }
+
+  /* ── Bottom Line ── */
+  .bottom-line {
+    position: absolute;
+    bottom: 16px;
+    left: 24px;
+    right: 24px;
+    background: #0A142E;
+    border: 2px solid #C0392B;
+    border-radius: 5px;
+    padding: 10px 18px 10px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 8px solid #C0392B;
+  }
+  .bl-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #C0392B;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .bl-main {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .bl-sub {
+    font-size: 12.5px;
+    color: #5DADE2;
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <div class="header">
+    <div class="title-en">AI-Driven SDLC</div>
+    <div class="title-zh">新一代 AI 驅動的軟體開發生命週期</div>
+  </div>
+
+  <div class="company">遠傳 FET</div>
+
+  <div class="gk-banner">
+    ✦ &nbsp; AI Gatekeeper &nbsp;—&nbsp; 全程把關每個 SDLC 節點 &nbsp; ✦
+  </div>
+
+  <div class="stages">
+
+    <div class="card">
+      <div class="card-num">01</div>
+      <div class="card-title">需求</div>
+      <div class="card-icon">📋</div>
+      <div class="card-divider"></div>
+      <div class="card-ai">AI 起草</div>
+      <div class="card-human">人類決策</div>
+    </div>
+
+    <div class="arrow">▶</div>
+
+    <div class="card">
+      <div class="card-num">02</div>
+      <div class="card-title">設計</div>
+      <div class="card-icon">📐</div>
+      <div class="card-divider"></div>
+      <div class="card-ai">AI 提案</div>
+      <div class="card-human">架構師定案</div>
+    </div>
+
+    <div class="arrow">▶</div>
+
+    <div class="card">
+      <div class="card-num">03</div>
+      <div class="card-title">開發</div>
+      <div class="card-icon">⌨️</div>
+      <div class="card-divider"></div>
+      <div class="card-ai">Human + AI</div>
+      <div class="card-human">結對開發</div>
+    </div>
+
+    <div class="arrow">▶</div>
+
+    <div class="card">
+      <div class="card-num">04</div>
+      <div class="card-title">測試</div>
+      <div class="card-icon">🧪</div>
+      <div class="card-divider"></div>
+      <div class="card-ai">AI 全自動</div>
+      <div class="card-human">測試覆蓋</div>
+    </div>
+
+    <div class="arrow">▶</div>
+
+    <div class="card">
+      <div class="card-num">05</div>
+      <div class="card-title">文件</div>
+      <div class="card-icon">📄</div>
+      <div class="card-divider"></div>
+      <div class="card-ai">AI 即時</div>
+      <div class="card-human">雙語文件化</div>
+    </div>
+
+  </div>
+
+  <div class="bottom-line">
+    <div class="bl-label">Bottom Line</div>
+    <div class="bl-main">AI Gatekeeper 全程把關</div>
+    <div class="bl-sub">每個節點自動過濾重複工作，工程師專注高價值決策</div>
+  </div>
+
+</div>
+</body>
+</html>
