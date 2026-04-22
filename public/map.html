@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>friDay CRM — 地圖</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/auth.js"></script>
+<style>
+  #map { height: calc(100dvh - 56px); }
+  .status-dot { width:12px; height:12px; border-radius:50%; border:2px solid white; box-shadow:0 1px 4px rgba(0,0,0,.4); }
+</style>
+</head>
+<body class="bg-gray-100">
+
+<!-- Header -->
+<header class="h-14 bg-blue-600 flex items-center justify-between px-4 text-white shadow-md">
+  <div class="flex items-center gap-2">
+    <span class="text-xl">📍</span>
+    <span class="font-bold text-lg">friDay CRM</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <span id="userName" class="text-sm opacity-90"></span>
+    <button onclick="logout()" class="text-sm bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors">登出</button>
+  </div>
+</header>
+
+<!-- Map -->
+<div id="map"></div>
+
+<!-- Bottom sheet for restaurant detail -->
+<div id="sheet" class="fixed inset-x-0 bottom-0 bg-white rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 z-[1000] max-h-[70vh] overflow-y-auto">
+  <div class="flex justify-center pt-3 pb-1">
+    <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+  </div>
+  <div class="px-5 pb-6 pt-2">
+    <div class="flex items-start justify-between mb-3">
+      <div>
+        <h2 id="sheetName" class="text-xl font-bold text-gray-800"></h2>
+        <p id="sheetCategory" class="text-sm text-gray-500"></p>
+      </div>
+      <span id="sheetStatus" class="text-xs font-medium px-2 py-1 rounded-full mt-1"></span>
+    </div>
+    <p id="sheetAddress" class="text-sm text-gray-600 mb-1"></p>
+    <p id="sheetPhone" class="text-sm text-gray-600 mb-4"></p>
+
+    <!-- Last report preview -->
+    <div id="lastReportBox" class="bg-gray-50 rounded-xl p-3 mb-4 hidden">
+      <p class="text-xs font-semibold text-gray-500 mb-1">上次回報</p>
+      <p id="lastReportDate" class="text-xs text-gray-400"></p>
+      <p id="lastReportNotes" class="text-sm text-gray-700 mt-1"></p>
+    </div>
+
+    <button id="reportBtn"
+      class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 rounded-xl transition-colors">
+      填寫回報
+    </button>
+  </div>
+</div>
+<div id="sheetOverlay" class="fixed inset-0 bg-black/30 z-[999] hidden" onclick="closeSheet()"></div>
+
+<script>
+  if (!requireLogin('rep')) throw new Error('redirect');
+
+  const user = getUser();
+  document.getElementById('userName').textContent = user.name;
+
+  let map;
+
+  const STATUS_LABELS = {
+    not_visited: '未拜訪',
+    visited_interested: '有興趣',
+    visited_not_interested: '無興趣',
+    follow_up: '待追蹤',
+    closed_won: '已簽約',
+    closed_lost: '未成交'
+  };
+  const STATUS_COLORS = {
+    not_visited: '#94a3b8',
+    visited_interested: '#f59e0b',
+    visited_not_interested: '#ef4444',
+    follow_up: '#3b82f6',
+    closed_won: '#22c55e',
+    closed_lost: '#6b7280'
+  };
+  const STATUS_BG = {
+    not_visited: 'bg-gray-100 text-gray-600',
+    visited_interested: 'bg-yellow-100 text-yellow-700',
+    visited_not_interested: 'bg-red-100 text-red-700',
+    follow_up: 'bg-blue-100 text-blue-700',
+    closed_won: 'bg-green-100 text-green-700',
+    closed_lost: 'bg-gray-200 text-gray-500'
+  };
+
+  function makeIcon(status) {
+    const color = STATUS_COLORS[status] || STATUS_COLORS.not_visited;
+    return L.divIcon({
+      className: '',
+      html: `<div style="background:${color};width:22px;height:22px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
+      iconSize: [22, 22], iconAnchor: [11, 11]
+    });
+  }
+
+  async function loadMap() {
+    map = L.map('map').setView([25.0330, 121.5654], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // User GPS
+    map.locate({ watch: true, setView: true, maxZoom: 16 });
+    map.on('locationfound', e => {
+      L.circleMarker(e.latlng, {
+        radius: 8, fillColor: '#3b82f6', color: 'white', weight: 2, fillOpacity: 1
+      }).addTo(map).bindPopup('你在這裡');
+    });
+
+    const res = await apiFetch('/api/restaurants');
+    const restaurants = await res.json();
+
+    restaurants.forEach(r => {
+      const marker = L.marker([r.lat, r.lng], { icon: makeIcon(r.latest_status) }).addTo(map);
+      marker.on('click', () => openSheet(r));
+    });
+  }
+
+  async function openSheet(r) {
+    document.getElementById('sheetName').textContent = r.name;
+    document.getElementById('sheetCategory').textContent = r.category || '';
+    document.getElementById('sheetAddress').textContent = r.address || '';
+    document.getElementById('sheetPhone').textContent = r.phone ? `📞 ${r.phone}` : '';
+
+    const statusEl = document.getElementById('sheetStatus');
+    const s = r.latest_status || 'not_visited';
+    statusEl.textContent = STATUS_LABELS[s];
+    statusEl.className = `text-xs font-medium px-2 py-1 rounded-full mt-1 ${STATUS_BG[s]}`;
+
+    // Load last report
+    const rres = await apiFetch(`/api/reports/restaurant/${r.id}`);
+    const reports = await rres.json();
+    const box = document.getElementById('lastReportBox');
+    if (reports.length > 0) {
+      const last = reports[0];
+      document.getElementById('lastReportDate').textContent = last.visited_at?.slice(0,10);
+      document.getElementById('lastReportNotes').textContent = last.notes || '（無備註）';
+      box.classList.remove('hidden');
+    } else { box.classList.add('hidden'); }
+
+    document.getElementById('reportBtn').onclick = () => {
+      sessionStorage.setItem('selected_restaurant', JSON.stringify(r));
+      location.href = '/report.html';
+    };
+
+    document.getElementById('sheet').classList.remove('translate-y-full');
+    document.getElementById('sheetOverlay').classList.remove('hidden');
+  }
+
+  function closeSheet() {
+    document.getElementById('sheet').classList.add('translate-y-full');
+    document.getElementById('sheetOverlay').classList.add('hidden');
+  }
+
+  loadMap();
+</script>
+</body>
+</html>

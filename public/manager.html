@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>friDay CRM — 主管介面</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/auth.js"></script>
+<style>
+  #map { height: 100%; min-height: 300px; }
+  .rep-card.active { @apply ring-2 ring-blue-500; }
+</style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+
+<!-- Header -->
+<header class="h-14 bg-indigo-700 flex items-center justify-between px-4 text-white shadow-md flex-shrink-0">
+  <div class="flex items-center gap-2">
+    <span class="text-xl">🗂️</span>
+    <span class="font-bold text-lg">主管介面</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <button onclick="showTab('map')" id="tabMap" class="text-sm px-3 py-1.5 rounded-lg bg-white/20">地圖</button>
+    <button onclick="showTab('reports')" id="tabReports" class="text-sm px-3 py-1.5 rounded-lg hover:bg-white/20">回報列表</button>
+    <button onclick="logout()" class="text-sm bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg">登出</button>
+  </div>
+</header>
+
+<!-- Map Tab -->
+<div id="viewMap" class="flex flex-1 overflow-hidden">
+  <!-- Left: Employee list -->
+  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-hidden hidden md:flex">
+    <div class="p-3 border-b border-gray-100">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">業務員</p>
+    </div>
+    <div id="repList" class="overflow-y-auto flex-1 p-2 space-y-1"></div>
+    <div class="p-3 border-t border-gray-100">
+      <button onclick="filterRep(null)" class="w-full text-sm text-gray-500 hover:text-blue-600 py-1">顯示全部</button>
+    </div>
+  </aside>
+
+  <!-- Right: Map -->
+  <div class="flex-1 relative">
+    <div id="map" class="absolute inset-0"></div>
+  </div>
+</div>
+
+<!-- Reports Tab -->
+<div id="viewReports" class="flex-1 overflow-y-auto hidden">
+  <div class="max-w-4xl mx-auto p-4">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-gray-800">所有回報記錄</h2>
+      <select id="filterUser" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white">
+        <option value="">全部業務</option>
+      </select>
+    </div>
+    <div id="reportsList" class="space-y-3"></div>
+  </div>
+</div>
+
+<!-- Assign Drawer -->
+<div id="drawer" class="fixed right-0 top-14 bottom-0 w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[1001] flex flex-col">
+  <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+    <h3 class="font-bold text-gray-800">指派餐廳</h3>
+    <button onclick="closeDrawer()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+  </div>
+  <div class="flex-1 overflow-y-auto p-4">
+    <div id="drawerRestaurant" class="bg-gray-50 rounded-xl p-3 mb-4"></div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">指派給</label>
+    <select id="assignUser" class="w-full border border-gray-200 rounded-xl px-3 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <option value="">— 選擇業務員 —</option>
+    </select>
+    <button onclick="doAssign()" id="assignBtn"
+      class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">
+      確認指派
+    </button>
+    <div id="assignMsg" class="mt-3 text-sm text-center hidden"></div>
+
+    <hr class="my-4">
+    <h4 class="text-sm font-semibold text-gray-700 mb-2">回報記錄</h4>
+    <div id="drawerReports" class="space-y-2"></div>
+  </div>
+</div>
+<div id="drawerOverlay" class="fixed inset-0 bg-black/20 z-[1000] hidden" onclick="closeDrawer()"></div>
+
+<!-- Add Restaurant Modal -->
+<button onclick="showAddModal()" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-14 h-14 text-2xl shadow-xl flex items-center justify-center z-50">+</button>
+
+<div id="addModal" class="fixed inset-0 bg-black/50 z-[2000] hidden flex items-end md:items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-md p-6">
+    <h3 class="font-bold text-lg mb-4">新增餐廳</h3>
+    <div class="space-y-3">
+      <input id="newName" placeholder="餐廳名稱 *" class="w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <input id="newAddress" placeholder="地址" class="w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <div class="flex gap-2">
+        <input id="newLat" placeholder="緯度 *" type="number" step="0.0001" class="w-1/2 border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <input id="newLng" placeholder="經度 *" type="number" step="0.0001" class="w-1/2 border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+      <input id="newPhone" placeholder="電話" class="w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <select id="newCategory" class="w-full border rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <option value="">類別</option>
+        <option>中式</option><option>日式</option><option>韓式</option>
+        <option>西式</option><option>泰式</option><option>火鍋</option>
+        <option>燒肉</option><option>吃到飽</option><option>其他</option>
+      </select>
+    </div>
+    <p id="addError" class="text-red-500 text-sm mt-2 hidden"></p>
+    <div class="flex gap-3 mt-5">
+      <button onclick="closeAddModal()" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-xl font-medium">取消</button>
+      <button onclick="doAddRestaurant()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">新增</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  if (!requireLogin('manager')) throw new Error('redirect');
+
+  const STATUS_LABELS = {
+    not_visited:'未拜訪', visited_interested:'有興趣',
+    visited_not_interested:'無興趣', follow_up:'待追蹤',
+    closed_won:'✅ 已簽約', closed_lost:'❌ 未成交'
+  };
+  const STATUS_COLORS = {
+    not_visited:'#94a3b8', visited_interested:'#f59e0b',
+    visited_not_interested:'#ef4444', follow_up:'#3b82f6',
+    closed_won:'#22c55e', closed_lost:'#6b7280'
+  };
+
+  let map, allRestaurants = [], allUsers = [], markers = {}, selectedRestaurant = null, activeRepFilter = null;
+
+  function makeIcon(status, repName) {
+    const color = STATUS_COLORS[status] || STATUS_COLORS.not_visited;
+    const initials = repName ? repName.slice(-2) : '';
+    return L.divIcon({
+      className: '',
+      html: `<div style="background:${color};width:28px;height:28px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center">
+               <span style="color:white;font-size:9px;font-weight:700">${initials}</span></div>`,
+      iconSize: [28, 28], iconAnchor: [14, 14]
+    });
+  }
+
+  async function init() {
+    map = L.map('map').setView([25.0330, 121.5654], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+    // Click on map to get coords for new restaurant
+    map.on('click', e => {
+      document.getElementById('newLat').value = e.latlng.lat.toFixed(6);
+      document.getElementById('newLng').value = e.latlng.lng.toFixed(6);
+    });
+
+    const [rRes, uRes] = await Promise.all([apiFetch('/api/restaurants'), apiFetch('/api/users')]);
+    allRestaurants = await rRes.json();
+    allUsers = await uRes.json();
+
+    renderRepList();
+    renderMarkers(allRestaurants);
+    populateUserSelects();
+  }
+
+  function renderRepList() {
+    const el = document.getElementById('repList');
+    el.innerHTML = allUsers.map(u => `
+      <button onclick="filterRep(${u.id})" id="rep-${u.id}"
+        class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-blue-50 transition-colors">
+        <div class="font-medium text-gray-800 text-sm">${u.name}</div>
+        <div class="text-xs text-gray-400">${u.assigned_count} 間餐廳</div>
+      </button>
+    `).join('');
+  }
+
+  function renderMarkers(restaurants) {
+    Object.values(markers).forEach(m => map.removeLayer(m));
+    markers = {};
+    restaurants.forEach(r => {
+      const m = L.marker([r.lat, r.lng], { icon: makeIcon(r.latest_status, r.assigned_to_name) }).addTo(map);
+      m.on('click', () => openDrawer(r));
+      markers[r.id] = m;
+    });
+  }
+
+  function filterRep(userId) {
+    activeRepFilter = userId;
+    document.querySelectorAll('[id^=rep-]').forEach(el => el.classList.remove('bg-blue-100'));
+    if (userId) document.getElementById(`rep-${userId}`)?.classList.add('bg-blue-100');
+    const filtered = userId ? allRestaurants.filter(r => r.assigned_to === userId) : allRestaurants;
+    renderMarkers(filtered);
+  }
+
+  function populateUserSelects() {
+    const opts = allUsers.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+    document.getElementById('assignUser').innerHTML = '<option value="">— 選擇業務員 —</option>' + opts;
+    document.getElementById('filterUser').innerHTML = '<option value="">全部業務</option>' + opts;
+  }
+
+  async function openDrawer(r) {
+    selectedRestaurant = r;
+    document.getElementById('drawerRestaurant').innerHTML = `
+      <p class="font-bold text-gray-800">${r.name}</p>
+      <p class="text-xs text-gray-500 mt-0.5">${r.address || ''}</p>
+      <p class="text-xs mt-1.5"><span class="font-medium">目前狀態：</span>${STATUS_LABELS[r.latest_status] || '未拜訪'}</p>
+      <p class="text-xs"><span class="font-medium">指派給：</span>${r.assigned_to_name || '未指派'}</p>
+    `;
+    if (r.assigned_to) document.getElementById('assignUser').value = r.assigned_to;
+
+    const rRes = await apiFetch(`/api/reports/restaurant/${r.id}`);
+    const reports = await rRes.json();
+    document.getElementById('drawerReports').innerHTML = reports.length === 0
+      ? '<p class="text-sm text-gray-400">尚無回報記錄</p>'
+      : reports.map(rp => `
+          <div class="bg-gray-50 rounded-xl p-3">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-semibold text-gray-600">${rp.user_name}</span>
+              <span class="text-xs text-gray-400">${rp.visited_at?.slice(0,10)}</span>
+            </div>
+            <p class="text-xs font-medium mt-1" style="color:${STATUS_COLORS[rp.status]}">${STATUS_LABELS[rp.status]}</p>
+            <p class="text-xs text-gray-600 mt-0.5">${rp.notes || ''}</p>
+            ${rp.photo_path ? `<img src="${rp.photo_path}" class="mt-2 rounded-lg w-full object-cover max-h-28">` : ''}
+          </div>
+        `).join('');
+
+    const msg = document.getElementById('assignMsg');
+    msg.classList.add('hidden');
+    document.getElementById('drawer').classList.remove('translate-x-full');
+    document.getElementById('drawerOverlay').classList.remove('hidden');
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawer').classList.add('translate-x-full');
+    document.getElementById('drawerOverlay').classList.add('hidden');
+    selectedRestaurant = null;
+  }
+
+  async function doAssign() {
+    if (!selectedRestaurant) return;
+    const userId = document.getElementById('assignUser').value;
+    if (!userId) return;
+    const btn = document.getElementById('assignBtn');
+    btn.disabled = true; btn.textContent = '指派中...';
+
+    const res = await apiFetch('/api/assignments', {
+      method: 'POST',
+      body: JSON.stringify({ restaurant_id: selectedRestaurant.id, user_id: parseInt(userId) })
+    });
+    const msg = document.getElementById('assignMsg');
+    if (res?.ok) {
+      msg.textContent = '✅ 指派成功'; msg.className = 'mt-3 text-sm text-center text-green-600';
+      // Refresh data
+      const rRes = await apiFetch('/api/restaurants');
+      allRestaurants = await rRes.json();
+      const uRes = await apiFetch('/api/users');
+      allUsers = await uRes.json();
+      renderRepList();
+      filterRep(activeRepFilter);
+    } else { msg.textContent = '指派失敗'; msg.className = 'mt-3 text-sm text-center text-red-500'; }
+    msg.classList.remove('hidden');
+    btn.disabled = false; btn.textContent = '確認指派';
+  }
+
+  // Reports tab
+  async function loadReports() {
+    const userId = document.getElementById('filterUser').value;
+    const url = userId ? `/api/reports?user_id=${userId}` : '/api/reports';
+    const res = await apiFetch(url);
+    const reports = await res.json();
+    document.getElementById('reportsList').innerHTML = reports.map(r => `
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <p class="font-bold text-gray-800">${r.restaurant_name}</p>
+            <p class="text-xs text-gray-500">${r.user_name} · ${r.visited_at?.slice(0,10)}</p>
+          </div>
+          <span class="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+            ${STATUS_LABELS[r.status] || r.status}
+          </span>
+        </div>
+        ${r.contact_name ? `<p class="text-sm text-gray-600">👤 ${r.contact_name} ${r.contact_phone || ''}</p>` : ''}
+        ${r.notes ? `<p class="text-sm text-gray-700 mt-1">${r.notes}</p>` : ''}
+        ${r.photo_path ? `<img src="${r.photo_path}" class="mt-2 rounded-xl w-full object-cover max-h-40">` : ''}
+      </div>
+    `).join('') || '<p class="text-center text-gray-400 py-8">暫無回報記錄</p>';
+  }
+
+  document.getElementById('filterUser').addEventListener('change', loadReports);
+
+  function showTab(tab) {
+    document.getElementById('viewMap').classList.toggle('hidden', tab !== 'map');
+    document.getElementById('viewReports').classList.toggle('hidden', tab !== 'reports');
+    document.getElementById('tabMap').className = `text-sm px-3 py-1.5 rounded-lg ${tab === 'map' ? 'bg-white/30 font-bold' : 'hover:bg-white/20'}`;
+    document.getElementById('tabReports').className = `text-sm px-3 py-1.5 rounded-lg ${tab === 'reports' ? 'bg-white/30 font-bold' : 'hover:bg-white/20'}`;
+    if (tab === 'reports') loadReports();
+    if (tab === 'map') setTimeout(() => map?.invalidateSize(), 100);
+  }
+
+  function showAddModal() { document.getElementById('addModal').classList.remove('hidden'); }
+  function closeAddModal() { document.getElementById('addModal').classList.add('hidden'); }
+
+  async function doAddRestaurant() {
+    const name = document.getElementById('newName').value.trim();
+    const lat  = parseFloat(document.getElementById('newLat').value);
+    const lng  = parseFloat(document.getElementById('newLng').value);
+    const err  = document.getElementById('addError');
+    if (!name || isNaN(lat) || isNaN(lng)) {
+      err.textContent = '請填寫餐廳名稱、緯度和經度'; err.classList.remove('hidden'); return;
+    }
+    const res = await apiFetch('/api/restaurants', {
+      method: 'POST',
+      body: JSON.stringify({
+        name, lat, lng,
+        address: document.getElementById('newAddress').value,
+        phone: document.getElementById('newPhone').value,
+        category: document.getElementById('newCategory').value
+      })
+    });
+    if (res?.ok) {
+      closeAddModal();
+      const rRes = await apiFetch('/api/restaurants');
+      allRestaurants = await rRes.json();
+      renderMarkers(allRestaurants);
+    } else { err.textContent = '新增失敗'; err.classList.remove('hidden'); }
+  }
+
+  init();
+</script>
+</body>
+</html>

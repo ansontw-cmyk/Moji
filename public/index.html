@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>friDay CRM — 登入</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="/js/auth.js"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-4">
+
+<div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-8">
+  <div class="text-center mb-8">
+    <div class="text-4xl mb-2">📍</div>
+    <h1 class="text-2xl font-bold text-gray-800">friDay CRM</h1>
+    <p class="text-sm text-gray-500 mt-1">餐廳業務回報系統</p>
+  </div>
+
+  <form id="loginForm" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">電子郵件</label>
+      <input id="email" type="email" required placeholder="your@email.com"
+        class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
+      <input id="password" type="password" required placeholder="••••••••"
+        class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <p id="errorMsg" class="text-red-500 text-sm hidden"></p>
+    <button type="submit" id="submitBtn"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors">
+      登入
+    </button>
+  </form>
+
+  <div class="mt-6 pt-6 border-t border-gray-100 text-xs text-gray-400 space-y-1">
+    <p><span class="font-medium text-gray-500">主管：</span>manager@demo.com</p>
+    <p><span class="font-medium text-gray-500">業務A：</span>rep1@demo.com</p>
+    <p><span class="font-medium text-gray-500">業務B：</span>rep2@demo.com</p>
+    <p class="text-gray-300">密碼均為 password123</p>
+  </div>
+</div>
+
+<script>
+  // If already logged in, redirect
+  if (getToken()) {
+    const u = getUser();
+    location.href = u?.role === 'manager' ? '/manager.html' : '/map.html';
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const err = document.getElementById('errorMsg');
+    btn.disabled = true; btn.textContent = '登入中...';
+    err.classList.add('hidden');
+
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      err.textContent = data.error || '登入失敗';
+      err.classList.remove('hidden');
+      btn.disabled = false; btn.textContent = '登入';
+      return;
+    }
+    setAuth(data.token, data.user);
+    location.href = data.user.role === 'manager' ? '/manager.html' : '/map.html';
+  });
+</script>
+</body>
+</html>
