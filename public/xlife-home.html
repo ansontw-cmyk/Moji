@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>遠傳心生活 — 首頁</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    body { background: #F5F3FF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+    .app-shell {
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #F5F3FF;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Daily Digest */
+    .digest-card {
+      overflow: hidden;
+      transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 80px;
+    }
+    .digest-card.expanded { height: 240px; }
+    .digest-collapsed { display: flex; align-items: center; justify-content: space-between; height: 80px; padding: 0 20px; cursor: pointer; }
+    .digest-expanded-body { padding: 0 20px 16px; display: grid; grid-template-columns: 120px 1fr; gap: 16px; }
+    .digest-chevron { transition: transform 0.3s ease; display: inline-block; font-style: normal; }
+    .digest-chevron.open { transform: rotate(180deg); }
+
+    /* Donut ring */
+    .donut-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: conic-gradient(#7C3AED 0% 68%, #E9D5FF 68% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .donut-inner {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Balance card */
+    .balance-card {
+      background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+      border-radius: 20px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .balance-card:active { transform: scale(0.97); }
+
+    /* Horizontal scroll */
+    .h-scroll { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+    .h-scroll::-webkit-scrollbar { display: none; }
+    .h-scroll-inner { display: flex; gap: 12px; padding: 4px 20px 8px; width: max-content; }
+
+    /* Context card */
+    .ctx-card {
+      width: 200px;
+      border-radius: 16px;
+      background: white;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(91,33,182,0.10);
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .ctx-card:active { transform: scale(0.97); }
+
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-top: 1px solid #EDE9FE;
+      display: flex;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0 6px;
+      font-size: 10px;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: color 0.2s;
+      text-decoration: none;
+    }
+    .tab-item.active { color: #7C3AED; }
+    .tab-icon { font-size: 20px; line-height: 1; margin-bottom: 3px; }
+
+    /* Notification badge */
+    .notif-dot {
+      width: 8px; height: 8px;
+      background: #EF4444;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px; right: 2px;
+    }
+
+    /* Pulse animation for expiry badge */
+    @keyframes pulse-badge {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .pulse { animation: pulse-badge 2s ease-in-out infinite; }
+
+    /* Scroll area padding for tab bar */
+    .scroll-content { padding-bottom: 72px; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Status Bar Spacer -->
+  <div style="height: env(safe-area-inset-top, 44px); background: #5B21B6;"></div>
+
+  <!-- Top Navigation -->
+  <div style="background: linear-gradient(160deg, #5B21B6 0%, #7C3AED 100%); padding: 16px 20px 24px;">
+    <div class="flex items-center justify-between">
+      <div>
+        <p style="color: #DDD6FE; font-size: 13px;">2026年5月2日 週六</p>
+        <h1 style="color: white; font-size: 22px; font-weight: 700; margin-top: 2px;">早安，志明 👋</h1>
+      </div>
+      <div style="position: relative; cursor: pointer;">
+        <div style="width:40px;height:40px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <div class="notif-dot" style="border: 2px solid #5B21B6;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="scroll-content" style="margin-top: -12px;">
+
+    <!-- Daily Digest Card -->
+    <div style="padding: 0 16px 0;">
+      <div class="digest-card" id="digestCard" style="background:white;border-radius:20px;box-shadow:0 4px 20px rgba(91,33,182,0.12);">
+        <!-- Collapsed Header -->
+        <div class="digest-collapsed" id="digestToggle" onclick="toggleDigest()">
+          <div class="flex items-center gap-3">
+            <div style="width:36px;height:36px;background:#EDE9FE;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📋</div>
+            <div>
+              <p style="font-size:15px;font-weight:600;color:#1F2937;">今日摘要</p>
+              <p style="font-size:12px;color:#6B7280;">點擊查看詳情</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:12px;color:#7C3AED;font-weight:500;">展開</span>
+            <i class="digest-chevron" id="digestChevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </i>
+          </div>
+        </div>
+
+        <!-- Expanded Body -->
+        <div id="digestBody" style="opacity:0;transition:opacity 0.25s ease 0.1s;">
+          <div class="digest-expanded-body">
+            <!-- Left: Donut Chart -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+              <div class="donut-ring">
+                <div class="donut-inner">
+                  <span style="font-size:18px;font-weight:700;color:#5B21B6;">68%</span>
+                  <span style="font-size:10px;color:#9CA3AF;">已用量</span>
+                </div>
+              </div>
+              <p style="font-size:11px;color:#6B7280;text-align:center;">本月流量<br/>6.8 / 10 GB</p>
+            </div>
+            <!-- Right: Today's Offers -->
+            <div style="padding-top:4px;">
+              <p style="font-size:13px;font-weight:600;color:#1F2937;margin-bottom:8px;">今日優惠</p>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="width:6px;height:6px;background:#7C3AED;border-radius:50%;flex-shrink:0;"></span>
+                  <span style="font-size:12px;color:#374151;">午間外食享 5% 幣回饋</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="width:6px;height:6px;background:#7C3AED;border-radius:50%;flex-shrink:0;"></span>
+                  <span style="font-size:12px;color:#374151;">friDay 影音限定劇</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="width:6px;height:6px;background:#10B981;border-radius:50%;flex-shrink:0;"></span>
+                  <span style="font-size:12px;color:#374151;">流量剩 32%，一切正常</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Bottom Banner -->
+          <div onclick="window.location.href='xlife-wallet.html'" style="margin:0 16px 16px;background:linear-gradient(90deg,#EDE9FE,#DDD6FE);border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:16px;">🏪</span>
+              <div>
+                <p style="font-size:12px;font-weight:600;color:#5B21B6;">附近全家</p>
+                <p style="font-size:11px;color:#7C3AED;">消費享幣折抵優惠</p>
+              </div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Balance Card -->
+    <div style="padding: 16px 16px 0;">
+      <div class="balance-card" onclick="window.location.href='xlife-wallet.html'" style="padding: 20px;">
+        <div class="flex items-center justify-between" style="margin-bottom:12px;">
+          <div>
+            <p style="font-size:13px;color:#DDD6FE;margin-bottom:4px;">遠傳幣餘額</p>
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <span style="font-size:36px;font-weight:800;letter-spacing:-1px;">3,850</span>
+              <span style="font-size:16px;font-weight:500;color:#DDD6FE;">幣</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:600;color:#FDE68A;">⭐ 黃金會員</span>
+            </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+        <!-- Expiry Alert -->
+        <div class="pulse" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span style="font-size:12px;color:#FCA5A5;font-weight:500;">500 幣將在 7 天後到期 — 點擊查看</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contextual Service Cards -->
+    <div style="padding: 20px 0 0;">
+      <div style="padding: 0 20px 10px; display:flex;align-items:center;justify-content:space-between;">
+        <h2 style="font-size:16px;font-weight:700;color:#1F2937;">為你推薦</h2>
+        <span style="font-size:12px;color:#7C3AED;cursor:pointer;">查看全部 →</span>
+      </div>
+      <div class="h-scroll">
+        <div class="h-scroll-inner">
+
+          <!-- Card 1: Lunch -->
+          <div class="ctx-card">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:36px;height:36px;background:#FEF3C7;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🍱</div>
+              <div style="background:#FEF3C7;border-radius:8px;padding:2px 8px;">
+                <span style="font-size:10px;font-weight:600;color:#D97706;">午休好時機</span>
+              </div>
+            </div>
+            <p style="font-size:14px;font-weight:700;color:#1F2937;margin-bottom:4px;">friDay 購物</p>
+            <p style="font-size:12px;color:#6B7280;margin-bottom:12px;">午間特賣，最高折 20%</p>
+            <div style="background:#F5F3FF;border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:12px;font-weight:600;color:#7C3AED;">幣折抵購物</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+          <!-- Card 2: Evening -->
+          <div class="ctx-card">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:36px;height:36px;background:#EDE9FE;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🎬</div>
+              <div style="background:#EDE9FE;border-radius:8px;padding:2px 8px;">
+                <span style="font-size:10px;font-weight:600;color:#7C3AED;">今晚追劇</span>
+              </div>
+            </div>
+            <p style="font-size:14px;font-weight:700;color:#1F2937;margin-bottom:4px;">friDay 影音</p>
+            <p style="font-size:12px;color:#6B7280;margin-bottom:12px;">100 幣折抵月費訂閱</p>
+            <div style="background:#F5F3FF;border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:12px;font-weight:600;color:#7C3AED;">立即折抵</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+          <!-- Card 3: Nearby -->
+          <div class="ctx-card">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:36px;height:36px;background:#D1FAE5;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🏪</div>
+              <div style="background:#D1FAE5;border-radius:8px;padding:2px 8px;">
+                <span style="font-size:10px;font-weight:600;color:#059669;">附近商家</span>
+              </div>
+            </div>
+            <p style="font-size:14px;font-weight:700;color:#1F2937;margin-bottom:4px;">全家便利商店</p>
+            <p style="font-size:12px;color:#6B7280;margin-bottom:12px;">消費享 3% 幣回饋</p>
+            <div style="background:#F0FDF4;border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:12px;font-weight:600;color:#059669;">距離 120m</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="padding: 16px 16px 0;">
+      <h2 style="font-size:16px;font-weight:700;color:#1F2937;margin-bottom:12px;">快速功能</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+        <div onclick="window.location.href='xlife-pay-reward.html'" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+          <div style="width:52px;height:52px;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(91,33,182,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;">💳</div>
+          <span style="font-size:11px;color:#374151;font-weight:500;">Pay</span>
+        </div>
+        <div onclick="window.location.href='xlife-wallet.html'" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+          <div style="width:52px;height:52px;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(91,33,182,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;">🪙</div>
+          <span style="font-size:11px;color:#374151;font-weight:500;">幣錢包</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+          <div style="width:52px;height:52px;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(91,33,182,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;">📱</div>
+          <span style="font-size:11px;color:#374151;font-weight:500;">電信</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+          <div style="width:52px;height:52px;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(91,33,182,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;">🎁</div>
+          <span style="font-size:11px;color:#374151;font-weight:500;">兌換</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div style="padding: 20px 16px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h2 style="font-size:16px;font-weight:700;color:#1F2937;">近期紀錄</h2>
+        <span onclick="window.location.href='xlife-wallet.html'" style="font-size:12px;color:#7C3AED;cursor:pointer;">查看全部 →</span>
+      </div>
+      <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(91,33,182,0.08);">
+        <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #F3F4F6;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;background:#D1FAE5;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;">🛒</div>
+            <div>
+              <p style="font-size:13px;font-weight:600;color:#1F2937;">全聯超市</p>
+              <p style="font-size:11px;color:#9CA3AF;">今天 12:34</p>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <p style="font-size:14px;font-weight:700;color:#10B981;">+75 幣</p>
+            <p style="font-size:11px;color:#9CA3AF;">NT$1,500</p>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #F3F4F6;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;background:#EDE9FE;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;">🎬</div>
+            <div>
+              <p style="font-size:13px;font-weight:600;color:#1F2937;">friDay 影音</p>
+              <p style="font-size:11px;color:#9CA3AF;">昨天 20:15</p>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <p style="font-size:14px;font-weight:700;color:#EF4444;">-100 幣</p>
+            <p style="font-size:11px;color:#9CA3AF;">折抵月費</p>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;background:#FEF3C7;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;">📞</div>
+            <div>
+              <p style="font-size:13px;font-weight:600;color:#1F2937;">電信帳單</p>
+              <p style="font-size:11px;color:#9CA3AF;">04/28 繳費</p>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <p style="font-size:14px;font-weight:700;color:#10B981;">+200 幣</p>
+            <p style="font-size:11px;color:#9CA3AF;">NT$999</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end scroll-content -->
+
+  <!-- Bottom Tab Bar -->
+  <nav class="tab-bar">
+    <a class="tab-item active" href="xlife-home.html">
+      <span class="tab-icon">🏠</span>
+      <span>首頁</span>
+    </a>
+    <a class="tab-item" href="#">
+      <span class="tab-icon">🧭</span>
+      <span>探索</span>
+    </a>
+    <a class="tab-item" href="xlife-wallet.html">
+      <span class="tab-icon">🪙</span>
+      <span>幣錢包</span>
+    </a>
+    <a class="tab-item" href="xlife-pay-reward.html">
+      <span class="tab-icon">💳</span>
+      <span>Pay</span>
+    </a>
+    <a class="tab-item" href="#">
+      <span class="tab-icon">👤</span>
+      <span>我的</span>
+    </a>
+  </nav>
+
+</div>
+
+<script>
+  let digestOpen = false;
+
+  function toggleDigest() {
+    digestOpen = !digestOpen;
+    const card = document.getElementById('digestCard');
+    const chevron = document.getElementById('digestChevron');
+    const body = document.getElementById('digestBody');
+
+    if (digestOpen) {
+      card.classList.add('expanded');
+      chevron.classList.add('open');
+      setTimeout(() => { body.style.opacity = '1'; }, 100);
+    } else {
+      body.style.opacity = '0';
+      chevron.classList.remove('open');
+      setTimeout(() => { card.classList.remove('expanded'); }, 50);
+    }
+  }
+</script>
+</body>
+</html>

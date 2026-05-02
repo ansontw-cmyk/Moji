@@ -14,6 +14,14 @@ app.use('/api/restaurants', requireAuth, require('./routes/restaurants'));
 app.use('/api/assignments', requireAuth, requireManager, require('./routes/assignments'));
 app.use('/api/reports',     requireAuth, require('./routes/reports'));
 
+// X-Life Super App BFF routes
+const xlifeWallet  = require('./routes/xlife-wallet');
+const xlifeHome    = require('./routes/xlife-home');
+const xlifePayment = require('./routes/xlife-payment');
+app.use('/api/xlife', xlifeWallet);
+app.use('/api/xlife', xlifeHome);
+app.use('/api/xlife', xlifePayment);
+
 app.use(express.static(path.join(__dirname, '../public')));
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api')) {
