@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DTIS AI 技術學院 — 轉型成果報告</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --red: #C00000;
+    --navy: #16213E;
+    --dark: #0F0F1A;
+    --accent: #00B4D8;
+    --gold: #F5A623;
+    --green: #2DC653;
+    --purple: #A055FF;
+  }
+  body { background: var(--dark); font-family: 'Segoe UI', system-ui, sans-serif; }
+  .gradient-text { background: linear-gradient(135deg, #00B4D8, #A055FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .card { background: var(--navy); border-radius: 12px; overflow: hidden; }
+  .card-red    { border-top: 4px solid var(--red); }
+  .card-accent { border-top: 4px solid var(--accent); }
+  .card-gold   { border-top: 4px solid var(--gold); }
+  .card-green  { border-top: 4px solid var(--green); }
+  .card-purple { border-top: 4px solid var(--purple); }
+  .stage-pill { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); border-radius:999px; padding:6px 14px; }
+  .timeline-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+  .stat-num { font-size: 3rem; font-weight: 800; line-height:1; }
+  .agent-flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .agent-box { background: rgba(0,180,216,0.1); border:1px solid rgba(0,180,216,0.3); border-radius:8px; padding:6px 12px; font-size:12px; white-space:nowrap; }
+  .agent-box.parallel { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); color: #F5A623; }
+  .agent-arrow { color: #8A9BB0; font-size:18px; }
+  section { padding: 64px 0; }
+  .section-tag { display:inline-block; background:var(--red); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:4px; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; }
+  .risk-badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; }
+  .risk-h { background:#7F1D1D; color:#FCA5A5; }
+  .risk-m { background:#78350F; color:#FCD34D; }
+  .risk-l { background:#14532D; color:#86EFAC; }
+  @keyframes countUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .animate-in { animation: countUp 0.6s ease-out forwards; }
+  .bar-fill { height:8px; border-radius:4px; background: linear-gradient(90deg, var(--accent), var(--purple)); }
+  nav a:hover { color: var(--accent); }
+</style>
+</head>
+<body class="text-white">
+
+<!-- NAV -->
+<nav class="sticky top-0 z-50 border-b border-white/10" style="background:rgba(15,15,26,0.95); backdrop-filter:blur(12px);">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-2 h-8 rounded" style="background:var(--red)"></div>
+      <span class="font-bold text-sm">遠傳 DTIS｜AI 技術學院</span>
+    </div>
+    <div class="hidden md:flex gap-6 text-sm text-gray-400">
+      <a href="#overview" class="transition">概況</a>
+      <a href="#arch" class="transition">架構</a>
+      <a href="#sdlc" class="transition">SDLC</a>
+      <a href="#cases" class="transition">案例</a>
+      <a href="#demo" class="transition">Demo</a>
+      <a href="#results" class="transition">成果</a>
+    </div>
+    <span class="text-xs px-2 py-1 rounded" style="background:var(--red)">2026 Q2</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="relative overflow-hidden" style="background: linear-gradient(135deg, #0F0F1A 0%, #16213E 60%, #1a0a2e 100%); min-height:90vh; display:flex; align-items:center;">
+  <div class="absolute inset-0" style="background-image: radial-gradient(circle at 20% 50%, rgba(0,180,216,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(160,85,255,0.08) 0%, transparent 50%);"></div>
+  <div class="max-w-6xl mx-auto px-6 py-20 relative w-full">
+    <div class="section-tag mb-4">DTIS AI 技術學院 轉型成果報告</div>
+    <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6">
+      AI 驅動工程未來<br>
+      <span class="gradient-text">DTIS 已在路上</span>
+    </h1>
+    <p class="text-xl text-gray-300 max-w-2xl mb-10 leading-relaxed">
+      「我們不是在導入 AI 工具，我們是在重新定義軟體開發的作業系統。」
+    </p>
+    <div class="flex flex-wrap gap-4 mb-16">
+      <div class="stat-card p-5 rounded-xl" style="background:rgba(0,180,216,0.1); border:1px solid rgba(0,180,216,0.3); min-width:140px;">
+        <div class="stat-num" style="color:var(--accent)">105</div>
+        <div class="text-sm text-gray-400 mt-1">AI 社群人數</div>
+        <div class="text-xs mt-1" style="color:var(--accent)">從 12 人成長</div>
+      </div>
+      <div class="stat-card p-5 rounded-xl" style="background:rgba(245,166,35,0.1); border:1px solid rgba(245,166,35,0.3); min-width:140px;">
+        <div class="stat-num" style="color:var(--gold)">20+</div>
+        <div class="text-sm text-gray-400 mt-1">Skills 封裝</div>
+        <div class="text-xs mt-1" style="color:var(--gold)">可重用 AI 模組</div>
+      </div>
+      <div class="stat-card p-5 rounded-xl" style="background:rgba(45,198,83,0.1); border:1px solid rgba(45,198,83,0.3); min-width:140px;">
+        <div class="stat-num" style="color:var(--green)">100%</div>
+        <div class="text-sm text-gray-400 mt-1">自動化覆蓋</div>
+        <div class="text-xs mt-1" style="color:var(--green)">AEM Migration</div>
+      </div>
+      <div class="stat-card p-5 rounded-xl" style="background:rgba(192,0,0,0.15); border:1px solid rgba(192,0,0,0.4); min-width:140px;">
+        <div class="stat-num" style="color:#ef4444">10+</div>
+        <div class="text-sm text-gray-400 mt-1">MCP Services</div>
+        <div class="text-xs mt-1" style="color:#ef4444">平台運行中</div>
+      </div>
+    </div>
+    <div class="text-sm text-gray-500">↓ 向下滾動探索完整報告</div>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<section id="overview" class="max-w-6xl mx-auto px-6">
+  <div class="section-tag">起源與成長</div>
+  <h2 class="text-3xl font-bold mb-2">三個月，從 12 人到 105 人</h2>
+  <p class="text-gray-400 mb-10">核心理念：讓 AI 負責 How，讓人專注 Why</p>
+  <div class="grid md:grid-cols-3 gap-4 mb-12">
+    <div class="card card-accent p-6">
+      <div class="text-5xl font-black mb-2" style="color:var(--accent)">2/5</div>
+      <div class="font-bold mb-1">2026 年 2 月 5 日</div>
+      <div class="text-sm text-gray-400">第一次會議，12 人參與，種下 AI 學院的種子</div>
+    </div>
+    <div class="card card-gold p-6">
+      <div class="text-5xl font-black mb-2" style="color:var(--gold)">×8.75</div>
+      <div class="font-bold mb-1">三個月社群成長</div>
+      <div class="text-sm text-gray-400">至 4 月已有 105 人在線上討論、分享、實踐</div>
+    </div>
+    <div class="card card-green p-6">
+      <div class="text-5xl font-black mb-2" style="color:var(--green)">30+</div>
+      <div class="font-bold mb-1">Skills + MCP Services</div>
+      <div class="text-sm text-gray-400">從社群討論到真實上線的技術資產</div>
+    </div>
+  </div>
+  <!-- Timeline -->
+  <div class="card p-6">
+    <h3 class="font-bold mb-6 text-lg">成長時間軸</h3>
+    <div class="space-y-4">
+      <div class="flex gap-4 items-start">
+        <div class="flex flex-col items-center"><div class="timeline-dot" style="background:var(--accent)"></div><div class="w-px h-8 bg-white/10 mt-1"></div></div>
+        <div><div class="text-sm font-bold" style="color:var(--accent)">2026 年 2 月</div><div class="text-sm text-gray-300">第一次會議 · 12 人 · 確立「AI 負責 How，人專注 Why」核心理念</div></div>
+      </div>
+      <div class="flex gap-4 items-start">
+        <div class="flex flex-col items-center"><div class="timeline-dot" style="background:var(--gold)"></div><div class="w-px h-8 bg-white/10 mt-1"></div></div>
+        <div><div class="text-sm font-bold" style="color:var(--gold)">2026 年 3 月</div><div class="text-sm text-gray-300">MCPHub 平台上線 · SDLC 五環節 Agent 部署完成 · 首批 Skills 封裝</div></div>
+      </div>
+      <div class="flex gap-4 items-start">
+        <div class="flex flex-col items-center"><div class="timeline-dot" style="background:var(--green)"></div></div>
+        <div><div class="text-sm font-bold" style="color:var(--green)">2026 年 4 月</div><div class="text-sm text-gray-300">社群成長至 105 人 · 四大應用案例上線 · AEM Migration 達成 100% 自動化</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="arch" class="max-w-6xl mx-auto px-6">
+  <div class="section-tag">核心架構</div>
+  <h2 class="text-3xl font-bold mb-2">不是工具堆疊，是有機協作系統</h2>
+  <p class="text-gray-400 mb-10">三層架構讓 AI 真正會做事，而不只是回答問題</p>
+  <div class="grid md:grid-cols-3 gap-6 mb-8">
+    <div class="card card-accent p-6 text-center">
+      <div class="text-4xl mb-3">🧠</div>
+      <div class="text-xl font-bold mb-1" style="color:var(--accent)">LLM  大腦</div>
+      <div class="text-sm text-gray-400 mb-4">思考 · 推理 · 判斷 · 決策</div>
+      <div class="text-xs bg-white/5 rounded p-2 text-gray-300">Claude / GPT / Gemini<br>負責「想清楚」</div>
+    </div>
+    <div class="card card-gold p-6 text-center">
+      <div class="text-4xl mb-3">📚</div>
+      <div class="text-xl font-bold mb-1" style="color:var(--gold)">Skills  專業知識</div>
+      <div class="text-sm text-gray-400 mb-4">封裝工程師 Domain Know-how</div>
+      <div class="text-xs bg-white/5 rounded p-2 text-gray-300">Requirement Auditor<br>Code Reviewer · 20+ 項</div>
+    </div>
+    <div class="card card-red p-6 text-center">
+      <div class="text-4xl mb-3">🦾</div>
+      <div class="text-xl font-bold mb-1" style="color:#ef4444">MCP  手腳</div>
+      <div class="text-sm text-gray-400 mb-4">AI 世界的 HTTP 協議</div>
+      <div class="text-xs bg-white/5 rounded p-2 text-gray-300">Playwright · PostgreSQL<br>維運 API · 10+ Services</div>
+    </div>
+  </div>
+  <!-- MCPHub -->
+  <div class="card p-6" style="border:1px solid rgba(0,180,216,0.2);">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-2xl">🔌</span>
+      <div>
+        <div class="font-bold text-lg" style="color:var(--accent)">MCPHub — AI Agent 世界的 API Gateway</div>
+        <div class="text-sm text-gray-400">統一管理所有 MCP Services，定位為 Control Plane</div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="bg-white/5 rounded-lg p-3 text-center">
+        <div class="text-lg font-bold" style="color:var(--accent)">分組管理</div>
+        <div class="text-xs text-gray-400 mt-1">降低 Token 浪費</div>
+      </div>
+      <div class="bg-white/5 rounded-lg p-3 text-center">
+        <div class="text-lg font-bold" style="color:var(--gold)">智慧路由</div>
+        <div class="text-xs text-gray-400 mt-1">語義檢索精準分派</div>
+      </div>
+      <div class="bg-white/5 rounded-lg p-3 text-center">
+        <div class="text-lg font-bold" style="color:var(--green)">即時監控</div>
+        <div class="text-xs text-gray-400 mt-1">效能視覺化</div>
+      </div>
+      <div class="bg-white/5 rounded-lg p-3 text-center">
+        <div class="text-lg font-bold" style="color:#ef4444">安全認證</div>
+        <div class="text-xs text-gray-400 mt-1">存取控制</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SDLC -->
+<section id="sdlc" class="max-w-6xl mx-auto px-6">
+  <div class="section-tag">SDLC AI 化</div>
+  <h2 class="text-3xl font-bold mb-2">從需求到維運，AI 全程在場</h2>
+  <p class="text-gray-400 mb-10">五個開發環節，五個專屬 AI Agent，沒有人力瓶頸，沒有知識孤島</p>
+  <div class="grid md:grid-cols-5 gap-3 mb-6">
+    <div class="card card-gold p-4 text-center">
+      <div class="text-2xl mb-2">📋</div>
+      <div class="font-bold text-sm mb-1" style="color:var(--gold)">需求</div>
+      <div class="text-xs text-gray-400 mb-2">Requirement<br>AI Auditor</div>
+      <div class="text-xs text-gray-500">拆解需求<br>識別模糊點<br>生成 User Story</div>
+    </div>
+    <div class="card card-accent p-4 text-center">
+      <div class="text-2xl mb-2">💻</div>
+      <div class="font-bold text-sm mb-1" style="color:var(--accent)">開發</div>
+      <div class="text-xs text-gray-400 mb-2">AI Pair<br>Programming</div>
+      <div class="text-xs text-gray-500">程式碼生成<br>架構建議<br>重構輔助</div>
+    </div>
+    <div class="card card-red p-4 text-center">
+      <div class="text-2xl mb-2">🔒</div>
+      <div class="font-bold text-sm mb-1" style="color:#ef4444">上版</div>
+      <div class="text-xs text-gray-400 mb-2">Security &<br>Logic Auditor</div>
+      <div class="text-xs text-gray-500">PR 雙層審核<br>風險分級<br>High Risk 退回</div>
+    </div>
+    <div class="card card-green p-4 text-center">
+      <div class="text-2xl mb-2">🧪</div>
+      <div class="font-bold text-sm mb-1" style="color:var(--green)">測試</div>
+      <div class="text-xs text-gray-400 mb-2">Auto Testing<br>Agent</div>
+      <div class="text-xs text-gray-500">UI 自動回歸<br>Playwright+MCP<br>持續覆蓋</div>
+    </div>
+    <div class="card card-purple p-4 text-center">
+      <div class="text-2xl mb-2">⚙️</div>
+      <div class="font-bold text-sm mb-1" style="color:var(--purple)">維運</div>
+      <div class="text-xs text-gray-400 mb-2">Diagnostic &<br>Analysis Agent</div>
+      <div class="text-xs text-gray-500">主動預警<br>多 MCP 推論<br>知識傳承</div>
+    </div>
+  </div>
+  <div class="rounded-xl p-4 text-center text-sm font-bold" style="background:rgba(0,60,120,0.5); border:1px solid rgba(0,180,216,0.2); color:var(--accent)">
+    MCPHub 統一工具平台 ── 所有 Agent 共享 10+ MCP Services
+  </div>
+</section>
+
+<!-- CASES -->
+<section id="cases" class="max-w-6xl mx-auto px-6">
+  <div class="section-tag">應用案例</div>
+  <h2 class="text-3xl font-bold mb-2">四大應用案例</h2>
+  <p class="text-gray-400 mb-10">真實交付，可量化，不是 POC</p>
+  <div class="grid md:grid-cols-2 gap-6">
+
+    <!-- Case 1 -->
+    <div class="card card-green p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl bg-white/5 p-2 rounded-lg">🎭</span>
+        <div>
+          <div class="text-xs font-bold" style="color:var(--green)">案例 01</div>
+          <div class="font-bold">UI 自動化回歸測試平台</div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="bg-red-950/40 border border-red-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-red-400 mb-1">痛點</div>
+          <div class="text-sm text-gray-300">測試腳本零散、人工維護成本高、回歸覆蓋不穩定</div>
+        </div>
+        <div class="bg-blue-950/40 border border-blue-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-blue-400 mb-1">解法</div>
+          <div class="text-sm text-gray-300">Playwright + MCP Server 建立持續回歸測試平台，自動處理 OTP / Captcha / 2FA</div>
+        </div>
+        <div class="border rounded-lg p-3" style="background:rgba(45,198,83,0.08); border-color:rgba(45,198,83,0.3);">
+          <div class="text-xs font-bold mb-1" style="color:var(--green)">成果</div>
+          <div class="text-sm font-bold" style="color:var(--green)">零散腳本 → 結構化持續平台</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 2 -->
+    <div class="card card-gold p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl bg-white/5 p-2 rounded-lg">🗄️</span>
+        <div>
+          <div class="text-xs font-bold" style="color:var(--gold)">案例 02</div>
+          <div class="font-bold">PostgreSQL 效能優化</div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="bg-red-950/40 border border-red-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-red-400 mb-1">痛點</div>
+          <div class="text-sm text-gray-300">DB 問題靠人工排查，知識不傳承，每次都重新來過</div>
+        </div>
+        <div class="bg-blue-950/40 border border-blue-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-blue-400 mb-1">解法</div>
+          <div class="text-sm text-gray-300">AI 管線：快照截取 → 報表解析 → 智能過濾 → AI 診斷建議 → 視覺化監控</div>
+        </div>
+        <div class="border rounded-lg p-3" style="background:rgba(245,166,35,0.08); border-color:rgba(245,166,35,0.3);">
+          <div class="text-xs font-bold mb-1" style="color:var(--gold)">成果</div>
+          <div class="text-sm font-bold" style="color:var(--gold)">被動滅火 → 主動預警，知識永久封裝</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 3 -->
+    <div class="card card-red p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl bg-white/5 p-2 rounded-lg">👁️</span>
+        <div>
+          <div class="text-xs font-bold text-red-400">案例 03</div>
+          <div class="font-bold">PR Code Review「無情審查員」</div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="bg-red-950/40 border border-red-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-red-400 mb-1">痛點</div>
+          <div class="text-sm text-gray-300">人工 Code Review 品質不穩定，高風險變更難以即時識別</div>
+        </div>
+        <div class="bg-blue-950/40 border border-blue-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-blue-400 mb-1">解法</div>
+          <div class="text-sm text-gray-300">雙層審核：第一道（開發：功能正確性）+ 第二道（維運：穩定性、風險防禦）</div>
+        </div>
+        <div class="border rounded-lg p-3" style="background:rgba(192,0,0,0.1); border-color:rgba(192,0,0,0.3);">
+          <div class="text-xs font-bold text-red-400 mb-2">成果：風險分級報告</div>
+          <div class="flex gap-2">
+            <span class="risk-badge risk-h">HIGH → 直接退回</span>
+            <span class="risk-badge risk-m">MEDIUM</span>
+            <span class="risk-badge risk-l">LOW</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 4 -->
+    <div class="card card-accent p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl bg-white/5 p-2 rounded-lg">🤖</span>
+        <div>
+          <div class="text-xs font-bold" style="color:var(--accent)">案例 04</div>
+          <div class="font-bold">DSP 維運助手</div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="bg-red-950/40 border border-red-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-red-400 mb-1">痛點</div>
+          <div class="text-sm text-gray-300">維運問題需跨系統查詢，耗時且依賴資深人員判斷</div>
+        </div>
+        <div class="bg-blue-950/40 border border-blue-900/40 rounded-lg p-3">
+          <div class="text-xs font-bold text-blue-400 mb-1">解法 — AI 自動多 MCP 推論</div>
+          <div class="agent-flow mt-2">
+            <div class="agent-box" style="color:var(--accent)">輸入門號</div>
+            <span class="agent-arrow">→</span>
+            <div class="agent-box" style="color:var(--accent)">查 User ID</div>
+            <span class="agent-arrow">→</span>
+            <div class="agent-box" style="color:var(--accent)">交易紀錄</div>
+            <span class="agent-arrow">→</span>
+            <div class="agent-box" style="color:var(--accent)">風險分析</div>
+          </div>
+        </div>
+        <div class="border rounded-lg p-3" style="background:rgba(0,180,216,0.08); border-color:rgba(0,180,216,0.3);">
+          <div class="text-xs font-bold mb-1" style="color:var(--accent)">成果</div>
+          <div class="text-sm font-bold" style="color:var(--accent)">秒級輸出完整風險結論，知識民主化</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AEM Migration -->
+  <div class="card mt-6 p-6" style="border:1px solid rgba(160,85,255,0.3);">
+    <div class="section-tag mb-3" style="background:var(--purple)">大型專案驗證</div>
+    <h3 class="text-2xl font-bold mb-1">AEM Cloud Migration</h3>
+    <p class="text-gray-400 text-sm mb-6">規模龐大到人工無法完整覆蓋的專案，AI 做到了 100%</p>
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="text-center">
+        <div class="text-4xl font-black" style="color:var(--accent)">292</div>
+        <div class="text-sm text-gray-400 mt-1">個元件升級</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl font-black" style="color:var(--gold)">27,709</div>
+        <div class="text-sm text-gray-400 mt-1">個網頁搬移</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl font-black" style="color:var(--green)">100%</div>
+        <div class="text-sm text-gray-400 mt-1">全站自動化覆蓋</div>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="bg-red-950/30 border border-red-900/30 rounded-lg p-4">
+        <div class="text-sm font-bold text-red-400 mb-2">導入 AI 前</div>
+        <div class="space-y-1 text-sm text-gray-400">
+          <div>✕  測試進度嚴重落後</div>
+          <div>✕  人工覆蓋率無法達標</div>
+          <div>✕  細微樣式差異難以偵測</div>
+        </div>
+      </div>
+      <div class="rounded-lg p-4" style="background:rgba(45,198,83,0.08); border:1px solid rgba(45,198,83,0.3);">
+        <div class="text-sm font-bold mb-2" style="color:var(--green)">導入 AI 後</div>
+        <div class="space-y-1 text-sm" style="color:var(--green)">
+          <div>✓  100% 全站自動化覆蓋達成</div>
+          <div>✓  AI 自動分析異常原因</div>
+          <div>✓  細微樣式差異自動偵測</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MULTI-AGENT DEMO -->
+<section id="demo" class="max-w-6xl mx-auto px-6">
+  <div class="section-tag">Multi-Agent 實戰 Demo</div>
+  <h2 class="text-3xl font-bold mb-2">心生活 Super App — 7 Agents，30 分鐘</h2>
+  <p class="text-gray-400 mb-10">從產品構想到可執行程式碼，零人工交接，完整展示 AI 工作流協作能力</p>
+  <div class="card p-6 mb-6" style="border:1px solid rgba(0,180,216,0.2);">
+    <div class="flex flex-wrap gap-4 mb-6 text-center">
+      <div class="flex-1 min-w-24"><div class="text-3xl font-black" style="color:var(--accent)">7</div><div class="text-xs text-gray-400">Agents</div></div>
+      <div class="flex-1 min-w-24"><div class="text-3xl font-black" style="color:var(--gold)">30</div><div class="text-xs text-gray-400">分鐘完成</div></div>
+      <div class="flex-1 min-w-24"><div class="text-3xl font-black" style="color:var(--green)">0</div><div class="text-xs text-gray-400">人工交接</div></div>
+      <div class="flex-1 min-w-24"><div class="text-3xl font-black" style="color:var(--purple)">4</div><div class="text-xs text-gray-400">並行 Phases</div></div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="space-y-3">
+      <div class="flex items-stretch gap-3">
+        <div class="flex flex-col items-center"><div class="text-xs font-bold px-2 py-1 rounded" style="background:rgba(192,0,0,0.3); color:#ef4444; writing-mode:horizontal-tb;">PHASE 1<br>並行</div></div>
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center gap-3 rounded-lg p-3" style="background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.2);">
+            <span class="text-xs font-bold px-2 py-0.5 rounded" style="background:var(--gold); color:#000;">01</span>
+            <span class="font-medium text-sm">Trend Researcher</span>
+            <span class="text-xs text-gray-400 ml-auto">→ 市場報告 + 競品矩陣</span>
+          </div>
+          <div class="flex items-center gap-3 rounded-lg p-3" style="background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.2);">
+            <span class="text-xs font-bold px-2 py-0.5 rounded" style="background:var(--gold); color:#000;">02</span>
+            <span class="font-medium text-sm">Product Manager</span>
+            <span class="text-xs text-gray-400 ml-auto">→ PRD + RICE 優先級</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-center text-gray-500 text-sm">↓ 合併洞察</div>
+      <div class="flex items-center gap-3 rounded-lg p-3" style="background:rgba(0,180,216,0.08); border:1px solid rgba(0,180,216,0.2);">
+        <div class="text-xs font-bold px-2 py-0.5 rounded" style="background:var(--accent); color:#000;">03</div>
+        <div class="font-medium text-sm">UX Architect</div>
+        <div class="text-xs text-gray-400 ml-auto">→ 用戶旅程 + 線框圖規格</div>
+      </div>
+      <div class="text-center text-gray-500 text-sm">↓</div>
+      <div class="flex items-center gap-3 rounded-lg p-3" style="background:rgba(192,0,0,0.08); border:1px solid rgba(192,0,0,0.2);">
+        <div class="text-xs font-bold px-2 py-0.5 rounded" style="background:var(--red); color:#fff;">04</div>
+        <div class="font-medium text-sm">Software Architect</div>
+        <div class="text-xs text-gray-400 ml-auto">→ 系統架構 + API Contract + DB Schema</div>
+      </div>
+      <div class="text-center text-gray-500 text-sm">↓</div>
+      <div class="flex items-stretch gap-3">
+        <div class="flex flex-col items-center"><div class="text-xs font-bold px-2 py-1 rounded" style="background:rgba(45,198,83,0.2); color:var(--green); writing-mode:horizontal-tb;">PHASE 4<br>並行</div></div>
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center gap-3 rounded-lg p-3" style="background:rgba(45,198,83,0.08); border:1px solid rgba(45,198,83,0.2);">
+            <span class="text-xs font-bold px-2 py-0.5 rounded" style="background:var(--green); color:#000;">05</span>
+            <span class="font-medium text-sm">Frontend Developer</span>
+            <span class="text-xs text-gray-400 ml-auto">→ HTML/CSS/JS 原型</span>
+          </div>
+          <div class="flex items-center gap-3 rounded-lg p-3" style="background:rgba(45,198,83,0.08); border:1px solid rgba(45,198,83,0.2);">
+            <span class="text-xs font-bold px-2 py-0.5 rounded" style="background:var(--green); color:#000;">06</span>
+            <span class="font-medium text-sm">Backend Architect</span>
+            <span class="text-xs text-gray-400 ml-auto">→ Node.js API + DB</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-center text-gray-500 text-sm">↓</div>
+      <div class="flex items-center gap-3 rounded-lg p-3" style="background:rgba(160,85,255,0.08); border:1px solid rgba(160,85,255,0.2);">
+        <div class="text-xs font-bold px-2 py-0.5 rounded" style="background:var(--purple); color:#fff;">07</div>
+        <div class="font-medium text-sm">Reality Checker（QA）</div>
+        <div class="text-xs text-gray-400 ml-auto">→ 跨驗一致性 · 風險報告</div>
+      </div>
+    </div>
+  </div>
+  <div class="rounded-xl p-4 text-sm" style="background:rgba(0,60,120,0.3); border:1px solid rgba(0,180,216,0.2);">
+    <span class="font-bold" style="color:var(--accent)">關鍵洞察：</span>
+    <span class="text-gray-300">Agent 之間不是「對話」，而是「文件傳遞」。每個 Output 是格式固定的結構化文件（Markdown / JSON Schema），Orchestrator 自動組裝交接，工程師設計「格式」，不是「對話內容」。</span>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results" class="max-w-6xl mx-auto px-6">
+  <div class="section-tag">量化成果</div>
+  <h2 class="text-3xl font-bold mb-2">數字不說謊，成果已驗證</h2>
+  <p class="text-gray-400 mb-10">每一項數字背後都是真實交付，不是 POC，不是實驗室數據</p>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+    <div class="card card-accent p-5">
+      <div class="text-4xl font-black mb-1" style="color:var(--accent)">105人</div>
+      <div class="font-bold text-sm mb-1">AI 社群規模</div>
+      <div class="text-xs text-gray-400">從 12 人成長，8.75 倍</div>
+      <div class="bar-fill mt-3" style="width:87.5%"></div>
+    </div>
+    <div class="card card-gold p-5">
+      <div class="text-4xl font-black mb-1" style="color:var(--gold)">20+</div>
+      <div class="font-bold text-sm mb-1">Skills 封裝</div>
+      <div class="text-xs text-gray-400">可重用 AI 能力模組</div>
+      <div class="bar-fill mt-3" style="width:70%; background:linear-gradient(90deg,var(--gold),#f97316)"></div>
+    </div>
+    <div class="card card-red p-5">
+      <div class="text-4xl font-black mb-1" style="color:#ef4444">10+</div>
+      <div class="font-bold text-sm mb-1">MCP Services</div>
+      <div class="text-xs text-gray-400">平台上線運行中</div>
+      <div class="bar-fill mt-3" style="width:60%; background:linear-gradient(90deg,#ef4444,#dc2626)"></div>
+    </div>
+    <div class="card card-green p-5">
+      <div class="text-4xl font-black mb-1" style="color:var(--green)">5/5</div>
+      <div class="font-bold text-sm mb-1">SDLC 覆蓋</div>
+      <div class="text-xs text-gray-400">需求到維運，全環節</div>
+      <div class="bar-fill mt-3" style="width:100%; background:linear-gradient(90deg,var(--green),#16a34a)"></div>
+    </div>
+    <div class="card card-purple p-5">
+      <div class="text-4xl font-black mb-1" style="color:var(--purple)">100%</div>
+      <div class="font-bold text-sm mb-1">自動化覆蓋率</div>
+      <div class="text-xs text-gray-400">AEM Migration 達成</div>
+      <div class="bar-fill mt-3" style="width:100%; background:linear-gradient(90deg,var(--purple),#7c3aed)"></div>
+    </div>
+    <div class="card card-accent p-5">
+      <div class="text-4xl font-black mb-1" style="color:var(--accent)">2 層</div>
+      <div class="font-bold text-sm mb-1">PR 審核機制</div>
+      <div class="text-xs text-gray-400">開發 + 維運雙重把關</div>
+      <div class="bar-fill mt-3" style="width:80%"></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="rounded-2xl p-8 text-center" style="background:linear-gradient(135deg, rgba(192,0,0,0.2), rgba(160,85,255,0.2)); border:1px solid rgba(192,0,0,0.3);">
+    <h3 class="text-2xl font-bold mb-3">基礎已立，下一步等您點頭</h3>
+    <p class="text-gray-300 mb-6 max-w-xl mx-auto">AI 技術學院已完成架構驗證、案例交付、社群建立。現具備向全集團技術部門橫向擴散的條件。</p>
+    <div class="grid md:grid-cols-3 gap-4 text-left">
+      <div class="bg-white/5 rounded-xl p-4">
+        <div class="font-bold text-sm mb-1" style="color:var(--red)">→ MCPHub 跨部門開放</div>
+        <div class="text-xs text-gray-400">將平台能力擴散至更多業務單位</div>
+      </div>
+      <div class="bg-white/5 rounded-xl p-4">
+        <div class="font-bold text-sm mb-1" style="color:var(--gold)">→ AI 技術學院正式建制</div>
+        <div class="text-xs text-gray-400">從自發社群升格為部門級常設機構</div>
+      </div>
+      <div class="bg-white/5 rounded-xl p-4">
+        <div class="font-bold text-sm mb-1" style="color:var(--green)">→ SDLC AI 化納入集團規範</div>
+        <div class="text-xs text-gray-400">讓 AI 工程標準成為全集團基線</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="mt-20 border-t border-white/10 py-8">
+  <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+    <div class="flex items-center gap-3">
+      <div class="w-1.5 h-6 rounded" style="background:var(--red)"></div>
+      <span>遠傳電信 DTIS｜AI 技術學院</span>
+    </div>
+    <div>轉型成果報告 ｜ 2026 Q2 ｜ 內部機密文件</div>
+  </div>
+</footer>
+
+</body>
+</html>
